@@ -61,6 +61,7 @@ model User {
   applicationsReviewed OnlineApplication[]
   employee             Employee?
   volunteer            Volunteer?
+  reportsGenerated     Report[]
 
   @@map("users")
 }
@@ -368,19 +369,3 @@ model Report {
 
   @@map("reports")
 }
-
-model SupportRecord {
-  id               Int      @id @default(autoincrement())
-  beneficiaryId    Int      @map("beneficiary_id")
-  beneficiaryType  String   // 'orphan' or 'family'
-  supportType      String   // 'financial', 'medical', 'educational'
-  amount           Decimal?
-  notes            String?
-  providedAt       DateTime @default(now()) @map("provided_at")
-  providerId       Int?     @map("provider_id")
-
-  provider         User?    @relation(fields: [providerId], references: [id])
-
-  @@map("support_records")
-}
-
