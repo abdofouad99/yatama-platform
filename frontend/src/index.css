@@ -1,0 +1,269 @@
+/* =====================================================
+   Yatama Charity Foundation — Global CSS
+   الهوية البصرية الرسمية للمؤسسة
+   ===================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap');
+
+/* =====================================================
+   متغيرات الألوان (CSS Variables)
+   ===================================================== */
+:root {
+  /* الألوان الأساسية للهوية المستخرجة (Yatama Official Branding) */
+  --color-primary:       #1B4DA1; /* أزرق ملكي */
+  --color-primary-dark:  #153A7A;
+  --color-primary-light: #3366CC;
+  --color-secondary:     #28A745; /* أخضر نقي حيوي */
+  --color-secondary-dark: #1E7E34;
+  --color-accent:        #FF8C00; /* ذهبي الدفء — تبرع الآن حصراً */
+  --color-accent-dark:   #e07b00;
+
+  /* خلفيات وحياد */
+  --color-bg:            #F5F5F5;
+  --color-bg-white:      #FFFFFF;
+  --color-bg-dark:       #0d1e2e;
+  --color-surface:       #FAFAFA;
+  --color-border:        #E0E0E0;
+
+  /* النصوص */
+  --color-text:          #333333;
+  --color-text-muted:    #6B7280;
+  --color-text-light:    #9CA3AF;
+
+  /* حالات */
+  --color-success:       #1F7A4A;
+  --color-error:         #E74C3C;
+  --color-warning:       #F59E0B;
+  --color-info:          #3498DB;
+
+  /* الخطوط */
+  --font-arabic:         'Tajawal', 'Noto Sans Arabic', sans-serif;
+  --font-heading-size-xl: 2.5rem;   /* 40px */
+  --font-heading-size-lg: 2rem;     /* 32px */
+  --font-heading-size-md: 1.5rem;   /* 24px */
+  --font-body-size:      1rem;      /* 16px */
+  --font-small-size:     0.875rem;  /* 14px */
+
+  /* الظلال الناعمة الفاخرة (Al-Safa Style) */
+  --shadow-sm:  0 2px 8px rgba(27, 77, 161, 0.04);
+  --shadow-md:  0 8px 24px rgba(27, 77, 161, 0.08);
+  --shadow-lg:  0 16px 40px rgba(27, 77, 161, 0.12);
+  --shadow-xl:  0 24px 60px rgba(27, 77, 161, 0.18);
+
+  /* الحدود المستديرة (High Border Radius) */
+  --radius-sm:  8px;
+  --radius-md:  16px;
+  --radius-lg:  24px;
+  --radius-xl:  32px;
+  --radius-full: 9999px;
+
+  /* الانتقالات */
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* =====================================================
+   إعادة الضبط الأساسية
+   ===================================================== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-arabic);
+  font-size:   var(--font-body-size);
+  color:       var(--color-text);
+  background:  var(--color-bg);
+  direction:   rtl;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+img { max-width: 100%; height: auto; display: block; }
+a   { color: inherit; text-decoration: none; }
+
+/* =====================================================
+   مكونات الأزرار (Buttons)
+   ===================================================== */
+.btn {
+  display:         inline-flex;
+  align-items:     center;
+  justify-content: center;
+  gap:             0.5rem;
+  padding:         0.75rem 1.75rem;
+  border:          2px solid transparent;
+  border-radius:   var(--radius-md);
+  font-family:     var(--font-arabic);
+  font-size:       1rem;
+  font-weight:     700;
+  cursor:          pointer;
+  transition:      var(--transition);
+  white-space:     nowrap;
+  outline:         none;
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(27, 77, 161, 0.25);
+}
+.btn-primary:hover {
+  background: var(--color-primary-light);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(27, 77, 161, 0.4);
+}
+
+/* زر التبرع الذهبي — الأهم في التصميم */
+.btn-donate {
+  background:  var(--color-accent);
+  color:       #fff;
+  font-size:   1.1rem;
+  font-weight: 800;
+  box-shadow:  0 4px 20px rgba(255, 140, 0, 0.4);
+  animation:   pulse-btn 2.5s infinite;
+}
+.btn-donate:hover {
+  background:  var(--color-accent-dark);
+  transform:   translateY(-3px) scale(1.03);
+  box-shadow:  0 8px 30px rgba(255, 140, 0, 0.5);
+}
+
+.btn-secondary {
+  background: transparent;
+  color:      var(--color-primary);
+  border-color: var(--color-primary);
+}
+.btn-secondary:hover {
+  background: var(--color-primary);
+  color:      #fff;
+}
+
+.btn-success {
+  background: var(--color-secondary);
+  color: #fff;
+}
+.btn-success:hover {
+  background: var(--color-secondary-dark);
+  transform: translateY(-2px);
+}
+
+/* =====================================================
+   مكونات البطاقات (Cards)
+   ===================================================== */
+.card {
+  background:    var(--color-bg-white);
+  border-radius: var(--radius-lg);
+  box-shadow:    var(--shadow-sm);
+  border:        1px solid var(--color-border);
+  overflow:      hidden;
+  transition:    all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Bounce effect */
+}
+.card:hover {
+  box-shadow: var(--shadow-lg);
+  transform:  translateY(-8px);
+}
+
+/* =====================================================
+   شريط التقدم للمشاريع (Progress Bar)
+   ===================================================== */
+.progress-bar-track {
+  width:         100%;
+  height:        10px;
+  background:    var(--color-border);
+  border-radius: var(--radius-full);
+  overflow:      hidden;
+}
+.progress-bar-fill {
+  height:        100%;
+  background:    linear-gradient(90deg, var(--color-secondary), #27ae60);
+  border-radius: var(--radius-full);
+  transition:    width 1s ease-in-out;
+}
+
+/* =====================================================
+   الـ Glass Morphism (للـ Hero Section)
+   ===================================================== */
+.glass {
+  background:  rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border:      1px solid rgba(255, 255, 255, 0.5);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+}
+
+.glass-dark {
+  background:  rgba(27, 77, 161, 0.8);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border:      1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-xl);
+  color: white;
+}
+
+/* =====================================================
+   الر Animations
+   ===================================================== */
+@keyframes pulse-btn {
+  0%, 100% { box-shadow: 0 4px 20px rgba(255, 140, 0, 0.4); }
+  50%       { box-shadow: 0 4px 30px rgba(255, 140, 0, 0.7); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.animate-fadeInUp { animation: fadeInUp 0.6s ease forwards; }
+.animate-fadeIn   { animation: fadeIn   0.5s ease forwards; }
+
+/* =====================================================
+   Utility Classes
+   ===================================================== */
+.container {
+  width:     100%;
+  max-width: 1200px;
+  margin:    0 auto;
+  padding:   0 1.5rem;
+}
+
+.section-title {
+  font-size:   var(--font-heading-size-lg);
+  font-weight: 800;
+  color:       var(--color-primary);
+  text-align:  center;
+  margin-bottom: 0.5rem;
+}
+.section-subtitle {
+  font-size:  1.1rem;
+  color:      var(--color-text-muted);
+  text-align: center;
+  margin-bottom: 3rem;
+}
+.section-divider {
+  width:      60px;
+  height:     4px;
+  background: var(--color-accent);
+  margin:     0.5rem auto 1rem;
+  border-radius: var(--radius-full);
+}
+
+/* =====================================================
+   Responsive Design
+   ===================================================== */
+@media (max-width: 768px) {
+  :root {
+    --font-heading-size-xl: 1.75rem;
+    --font-heading-size-lg: 1.5rem;
+    --font-heading-size-md: 1.25rem;
+  }
+  .container { padding: 0 1rem; }
+  .btn { padding: 0.625rem 1.25rem; font-size: 0.9rem; }
+}

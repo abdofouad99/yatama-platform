@@ -1,0 +1,386 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id          Int              @id @default(autoincrement())
+  name        String
+  slug        String           @unique
+  description String?
+  createdAt   DateTime         @default(now()) @map("created_at")
+  users       User[]
+  permissions RolePermission[]
+
+  @@map("roles")
+}
+
+model Permission {
+  id    Int              @id @default(autoincrement())
+  name  String
+  slug  String           @unique
+  roles RolePermission[]
+
+  @@map("permissions")
+}
+
+model RolePermission {
+  roleId       Int        @map("role_id")
+  permissionId Int        @map("permission_id")
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  roleId    Int       @map("role_id")
+  fullName  String    @map("full_name")
+  email     String    @unique
+  phone     String?
+  password  String
+  avatarUrl String?   @map("avatar_url")
+  isActive  Boolean   @default(true) @map("is_active")
+  lastLogin DateTime? @map("last_login")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  role      Role      @relation(fields: [roleId], references: [id])
+
+  orphansRegistered    Orphan[]            @relation("RegisteredBy")
+  supportProvided      SupportRecord[]
+  transactionsCreated  FinancialTransaction[]
+  tasksAssigned        Task[]              @relation("AssignedTo")
+  tasksAssignedBy      Task[]              @relation("AssignedBy")
+  projectsManaged      Project[]
+  applicationsReviewed OnlineApplication[]
+  employee             Employee?
+  volunteer            Volunteer?
+
+  @@map("users")
+}
+
+model Family {
+  id            Int             @id @default(autoincrement())
+  headName      String          @map("head_name")
+  membersCount  Int             @default(1) @map("members_count")
+  monthlyIncome Float           @default(0) @map("monthly_income")
+  address       String?
+  governorate   String?
+  district      String?
+  phone         String?
+  nationalId    String?         @unique @map("national_id")
+  status        String          @default("pending")
+  notes         String?
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime        @updatedAt @map("updated_at")
+  orphans       Orphan[]
+  supportRecords SupportRecord[]
+
+  @@map("families")
+}
+
+model Orphan {
+  id                 Int             @id @default(autoincrement())
+  familyId           Int?            @map("family_id")
+  fullName           String          @map("full_name")
+  dateOfBirth        DateTime?       @map("date_of_birth")
+  gender             String
+  guardianName       String?         @map("guardian_name")
+  guardianPhone      String?         @map("guardian_phone")
+  healthStatus       String          @default("good") @map("health_status")
+  schoolLevel        String?         @map("school_level")
+  schoolName         String?         @map("school_name")
+  address            String?
+  governorate        String?
+  photoUrl           String?         @map("photo_url")
+  sponsorshipStatus  String          @default("unsponsored") @map("sponsorship_status")
+  notes              String?
+  registeredBy       Int?            @map("registered_by")
+  createdAt          DateTime        @default(now()) @map("created_at")
+  updatedAt          DateTime        @updatedAt @map("updated_at")
+  family             Family?         @relation(fields: [familyId], references: [id])
+  registeredByUser   User?           @relation("RegisteredBy", fields: [registeredBy], references: [id])
+  supportRecords     SupportRecord[]
+
+  @@map("orphans")
+}
+
+model Donor {
+  id            Int        @id @default(autoincrement())
+  userId        Int?       @unique @map("user_id")
+  fullName      String     @map("full_name")
+  email         String?
+  phone         String?
+  country       String?    @default("اليمن")
+  isAnonymous   Boolean    @default(false) @map("is_anonymous")
+  totalDonated  Float      @default(0) @map("total_donated")
+  createdAt     DateTime   @default(now()) @map("created_at")
+  donations     Donation[]
+
+  @@map("donors")
+}
+
+model Project {
+  id            Int                    @id @default(autoincrement())
+  title         String
+  description   String?
+  category      String
+  goalAmount    Float                  @default(0) @map("goal_amount")
+  currentAmount Float                  @default(0) @map("current_amount")
+  status        String                 @default("active")
+  startDate     DateTime?              @map("start_date")
+  endDate       DateTime?              @map("end_date")
+  coverImageUrl String?                @map("cover_image_url")
+  isFeatured    Boolean                @default(false) @map("is_featured")
+  managedBy     Int?                   @map("managed_by")
+  createdAt     DateTime               @default(now()) @map("created_at")
+  updatedAt     DateTime               @updatedAt @map("updated_at")
+  manager       User?                  @relation(fields: [managedBy], references: [id])
+  donations     Donation[]
+  budget        Budget?
+  tasks         Task[]
+  supportRecords SupportRecord[]
+  transactions  FinancialTransaction[]
+
+  @@map("projects")
+}
+
+model Donation {
+  id            Int      @id @default(autoincrement())
+  donorId       Int      @map("donor_id")
+  projectId     Int?     @map("project_id")
+  amount        Float
+  currency      String   @default("USD")
+  type          String   @default("one_time")
+  paymentMethod String   @default("stripe") @map("payment_method")
+  paymentRef    String?  @map("payment_ref")
+  receiptNumber String?  @unique @map("receipt_number")
+  status        String   @default("pending")
+  notes         String?
+  donatedAt     DateTime @default(now()) @map("donated_at")
+  donor         Donor    @relation(fields: [donorId], references: [id])
+  project       Project? @relation(fields: [projectId], references: [id])
+
+  @@map("donations")
+}
+
+model SupportRecord {
+  id          Int      @id @default(autoincrement())
+  orphanId    Int?     @map("orphan_id")
+  familyId    Int?     @map("family_id")
+  projectId   Int?     @map("project_id")
+  type        String
+  amount      Float    @default(0)
+  description String?
+  documentUrl String?  @map("document_url")
+  providedBy  Int?     @map("provided_by")
+  supportDate DateTime @map("support_date")
+  createdAt   DateTime @default(now()) @map("created_at")
+  orphan      Orphan?  @relation(fields: [orphanId], references: [id])
+  family      Family?  @relation(fields: [familyId], references: [id])
+  project     Project? @relation(fields: [projectId], references: [id])
+  provider    User?    @relation(fields: [providedBy], references: [id])
+
+  @@map("support_records")
+}
+
+model FinancialTransaction {
+  id          Int      @id @default(autoincrement())
+  type        String
+  category    String?
+  amount      Float
+  currency    String   @default("USD")
+  projectId   Int?     @map("project_id")
+  donationId  Int?     @map("donation_id")
+  description String?
+  receiptUrl  String?  @map("receipt_url")
+  transDate   DateTime @map("trans_date")
+  createdBy   Int?     @map("created_by")
+  createdAt   DateTime @default(now()) @map("created_at")
+  project     Project? @relation(fields: [projectId], references: [id])
+  creator     User?    @relation(fields: [createdBy], references: [id])
+
+  @@map("financial_transactions")
+}
+
+model Budget {
+  id             Int      @id @default(autoincrement())
+  projectId      Int      @unique @map("project_id")
+  totalAmount    Float    @map("total_amount")
+  spentAmount    Float    @default(0) @map("spent_amount")
+  reservedAmount Float    @default(0) @map("reserved_amount")
+  fiscalYear     Int?     @map("fiscal_year")
+  notes          String?
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  project        Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("budgets")
+}
+
+model Employee {
+  id           Int      @id @default(autoincrement())
+  userId       Int      @unique @map("user_id")
+  position     String?
+  department   String?
+  salary       Float    @default(0)
+  hireDate     DateTime? @map("hire_date")
+  contractType String   @default("full_time") @map("contract_type")
+  isActive     Boolean  @default(true) @map("is_active")
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("employees")
+}
+
+model Volunteer {
+  id           Int      @id @default(autoincrement())
+  userId       Int      @unique @map("user_id")
+  skills       String?
+  availability String   @default("on_demand")
+  joinedDate   DateTime? @map("joined_date")
+  totalHours   Int      @default(0) @map("total_hours")
+  isActive     Boolean  @default(true) @map("is_active")
+  notes        String?
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("volunteers")
+}
+
+model Task {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String?
+  projectId   Int?      @map("project_id")
+  assignedTo  Int?      @map("assigned_to")
+  assignedBy  Int?      @map("assigned_by")
+  status      String    @default("todo")
+  priority    String    @default("medium")
+  dueDate     DateTime? @map("due_date")
+  completedAt DateTime? @map("completed_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  project     Project?  @relation(fields: [projectId], references: [id])
+  assignee    User?     @relation("AssignedTo", fields: [assignedTo], references: [id])
+  assigner    User?     @relation("AssignedBy", fields: [assignedBy], references: [id])
+
+  @@map("tasks")
+}
+
+model OnlineApplication {
+  id              Int       @id @default(autoincrement())
+  applicantName   String    @map("applicant_name")
+  applicantPhone  String    @map("applicant_phone")
+  applicantEmail  String?   @map("applicant_email")
+  nationalId      String?   @map("national_id")
+  governorate     String?
+  address         String?
+  applicationType String    @map("application_type")
+  membersCount    Int       @default(1) @map("members_count")
+  monthlyIncome   Float     @default(0) @map("monthly_income")
+  description     String?
+  document1Url    String?   @map("document_1_url")
+  document2Url    String?   @map("document_2_url")
+  document3Url    String?   @map("document_3_url")
+  status          String    @default("pending")
+  reviewNotes     String?   @map("review_notes")
+  reviewedBy      Int?      @map("reviewed_by")
+  reviewedAt      DateTime? @map("reviewed_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  reviewer        User?     @relation(fields: [reviewedBy], references: [id])
+
+  @@map("online_applications")
+}
+
+model Story {
+  id               Int      @id @default(autoincrement())
+  title            String
+  summary          String?
+  content          String?
+  imageUrl         String?  @map("image_url")
+  beneficiaryType  String?  @map("beneficiary_type")
+  isPublished      Boolean  @default(true) @map("is_published")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  @@map("stories")
+}
+
+model NewsArticle {
+  id               Int      @id @default(autoincrement())
+  title            String
+  summary          String?
+  content          String?
+  imageUrl         String?  @map("image_url")
+  isPublished      Boolean  @default(true) @map("is_published")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  @@map("news_articles")
+}
+
+model Partner {
+  id               Int      @id @default(autoincrement())
+  name             String
+  logoUrl          String?  @map("logo_url")
+  websiteUrl       String?  @map("website_url")
+  type             String   @default("partner")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  @@map("partners")
+}
+
+model TransparencyReport {
+  id               Int      @id @default(autoincrement())
+  title            String
+  description      String?
+  fileUrl          String   @map("file_url")
+  year             Int
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  @@map("transparency_reports")
+}
+
+model ContactMessage {
+  id               Int      @id @default(autoincrement())
+  name             String
+  email            String?
+  phone            String?
+  subject          String?
+  message          String
+  status           String   @default("unread") 
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  @@map("contact_messages")
+}
+
+model Report {
+  id               Int      @id @default(autoincrement())
+  title            String
+  content          String?
+  type             String   @default("financial") // إداري، مالي، إحصائي
+  fileUrl          String?  @map("file_url")
+  generatedBy      Int?     @map("generated_by")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  creator          User?    @relation(fields: [generatedBy], references: [id])
+
+  @@map("reports")
+}
+
+model SupportRecord {
+  id               Int      @id @default(autoincrement())
+  beneficiaryId    Int      @map("beneficiary_id")
+  beneficiaryType  String   // 'orphan' or 'family'
+  supportType      String   // 'financial', 'medical', 'educational'
+  amount           Decimal?
+  notes            String?
+  providedAt       DateTime @default(now()) @map("provided_at")
+  providerId       Int?     @map("provider_id")
+
+  provider         User?    @relation(fields: [providerId], references: [id])
+
+  @@map("support_records")
+}
+
