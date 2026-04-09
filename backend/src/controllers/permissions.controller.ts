@@ -14,9 +14,9 @@ export const getPermissions = async (req: Request, res: Response): Promise<void>
 
 export const createPermission = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { name, description } = req.body;
+    const { name } = req.body;
     const perm = await prisma.permission.create({
-      data: { name, description }
+      data: { name, slug: name.toLowerCase().replace(/\s+/g, '-') }
     });
     res.status(201).json({ success: true, data: perm });
   } catch (err) {
@@ -27,10 +27,10 @@ export const createPermission = async (req: Request, res: Response): Promise<voi
 export const updatePermission = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const { name, description } = req.body;
+    const { name } = req.body;
     const perm = await prisma.permission.update({
       where: { id: Number(id) },
-      data: { name, description }
+      data: { name, slug: name.toLowerCase().replace(/\s+/g, '-') }
     });
     res.json({ success: true, data: perm });
   } catch (err) {

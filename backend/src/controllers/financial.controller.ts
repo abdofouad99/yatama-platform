@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import prisma from '../config/database';
+import { AuthRequest } from '../middleware/auth.middleware';
 
 export const getTransactions = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -16,7 +17,7 @@ export const getTransactions = async (req: Request, res: Response): Promise<void
   }
 };
 
-export const createTransaction = async (req: Request, res: Response): Promise<void> => {
+export const createTransaction = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { type, amount, category, description, projectId, transDate } = req.body;
     const trans = await prisma.financialTransaction.create({

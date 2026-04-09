@@ -12,8 +12,8 @@ export const getBeneficiaries = async (req: AuthRequest, res: Response): Promise
     if (gender)      where.gender      = gender;
 
     const [beneficiaries, total] = await Promise.all([
-      prisma.beneficiary.findMany({ where, orderBy: { createdAt: 'desc' }, skip, take: Number(limit) }),
-      prisma.beneficiary.count({ where }),
+      prisma.orphan.findMany({ where, orderBy: { createdAt: 'desc' }, skip, take: Number(limit) }),
+      prisma.orphan.count({ where }),
     ]);
     res.json({ success: true, data: { beneficiaries, total, pagination: { page: Number(page), limit: Number(limit), pages: Math.ceil(total / Number(limit)) } } });
   } catch (err) {
@@ -30,7 +30,7 @@ export const createBeneficiary = async (req: AuthRequest, res: Response): Promis
       res.status(400).json({ success: false, message: 'الاسم وتاريخ الميلاد والجنس والمحافظة مطلوبة' });
       return;
     }
-    const b = await prisma.beneficiary.create({
+    const b = await prisma.orphan.create({
       data: { fullName, dateOfBirth: new Date(dateOfBirth), gender, governorate, guardianName: guardianName || null, guardianPhone: guardianPhone || null, notes: notes || null },
     });
     res.status(201).json({ success: true, message: 'تم تسجيل المستفيد بنجاح', data: b });
@@ -44,7 +44,7 @@ export const updateBeneficiary = async (req: AuthRequest, res: Response): Promis
   try {
     const { id } = req.params;
     const { fullName, dateOfBirth, gender, governorate, guardianName, guardianPhone, notes } = req.body;
-    const b = await prisma.beneficiary.update({
+    const b = await prisma.orphan.update({
       where: { id: Number(id) },
       data: {
         ...(fullName     && { fullName }),
